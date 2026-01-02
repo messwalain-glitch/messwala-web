@@ -32,6 +32,10 @@
 const PASSWORD = "messwala123";
 const API_URL = "https://script.google.com/macros/s/AKfycbxIgv4y6NZBItcS7EC-yurdGQSL5LSNOek_OEytJ7RH7EGySvzHa8wvCqh4s99eHvbs/exec";
 
+// 🔴 CHANGE ONLY IF YOUR UPI ID CHANGES
+const UPI_ID = "8888801902@yescred";
+const UPI_NAME = "Mess Wala";
+
 function login() {
   if (document.getElementById("adminPass").value === PASSWORD) {
     document.getElementById("login").style.display = "none";
@@ -85,21 +89,18 @@ function update(row, status) {
   .then(() => loadData());
 }
 
+// 🔥 PAYMENT REMINDER WITH AUTO UPI LINK
 function sendReminder(mobile, name, plan) {
-  const msg =
-    "Hi " + name + ",%0A" +
-    "This is a reminder for your Mess Wala payment.%0A" +
-    "Plan: " + plan + "%0A" +
-    "Kindly complete the payment at the earliest.%0A%0A" +
-    "Thank you,%0A" +
-    "Mess Wala";
+  let amount = 0;
+  if (plan.includes("1500")) amount = 1500;
+  if (plan.includes("2800")) amount = 2800;
+  if (plan.includes("75")) amount = 75;
 
-  window.open(
-    "https://wa.me/91" + mobile + "?text=" + msg,
-    "_blank"
-  );
-}
-</script>
+  const upiLink =
+    "upi://pay?pa=" + UPI_ID +
+    "&pn=" + encodeURIComponent(UPI_NAME) +
+    "&am=" + amount +
+    "&cu=INR" +
+    "&tn=Mess%20Wala%20Payment";
 
-</body>
-</html>
+  con
