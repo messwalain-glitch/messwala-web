@@ -10,45 +10,56 @@
 
 <div id="login">
   <h2>Admin Login</h2>
-  <input type="password" id="adminPass" placeholder="Enter Admin Password">
+  <input type="password" id="adminPass" placeholder="Admin Password">
   <br><br>
-  <button onclick="checkLogin()">Login</button>
+  <button onclick="login()">Login</button>
 </div>
 
 <div id="dashboard" style="display:none;">
-  <h2>Orders Dashboard</h2>
-  <div id="orders">Loading...</div>
+  <h2>Monthly Summary</h2>
+
+  <div class="menu-card">
+    💰 Total Collection: ₹<span id="total">0</span><br>
+    ✅ Paid Members: <span id="paid">0</span><br>
+    ❌ Unpaid Members: <span id="unpaid">0</span>
+  </div>
+
+  <h2>Orders</h2>
+  <div id="orders"></div>
 </div>
 
 <script>
-const PASSWORD = "messwala123";   // you can change this
+const PASSWORD = "messwala123";
 const API_URL = "https://script.google.com/macros/s/AKfycbxIgv4y6NZBItcS7EC-yurdGQSL5LSNOek_OEytJ7RH7EGySvzHa8wvCqh4s99eHvbs/exec";
 
-function checkLogin() {
-  const input = document.getElementById("adminPass").value;
-  if (input === PASSWORD) {
+function login() {
+  if (document.getElementById("adminPass").value === PASSWORD) {
     document.getElementById("login").style.display = "none";
     document.getElementById("dashboard").style.display = "block";
-    loadOrders();
+    loadData();
   } else {
     alert("Wrong password");
   }
 }
 
-function loadOrders() {
+function loadData() {
   fetch(API_URL)
     .then(res => res.json())
     .then(data => {
+      document.getElementById("total").innerText = data.totalCollection;
+      document.getElementById("paid").innerText = data.paidCount;
+      document.getElementById("unpaid").innerText = data.unpaidCount;
+
       let html = "";
-      data.forEach(order => {
+      data.orders.forEach(o => {
         html += `
           <div class="menu-card">
-            <b>${order.name}</b><br>
-            📞 ${order.mobile}<br>
-            🧾 ${order.plan}<br>
-            💰 Status: <b>${order.status}</b><br><br>
-            <button onclick="updateStatus(${order.row}, 'PAID')">Mark PAID</button>
-            <button onclick="updateStatus(${order.row}, 'UNPAID')">Mark UNPAID</button>
+            <b>${o.name}</b><br>
+            📞 ${o.mobile}<br>
+            🧾 ${o.plan}<br>
+            💰 Status: <b>${o.status}</b><br><br>
+            <button onclick="update(${o.row}, 'PAID')">Mark PAID</button>
+            <button onclick="update(${o.row}, 'UNPAID')">Mark UNPAID</button>
           </div>
         `;
       });
@@ -56,20 +67,15 @@ function loadOrders() {
     });
 }
 
-function updateStatus(row, status) {
+function update(row, status) {
   fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      row: row,
-      status: status
-    })
+    body: JSON.stringify({ row: row, status: status })
   })
-  .then(() => loadOrders());
+  .then(() => loadData());
 }
 </script>
 
 </body>
 </html>
-
-
