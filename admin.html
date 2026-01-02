@@ -8,13 +8,15 @@
 </head>
 <body>
 
+<!-- LOGIN -->
 <div id="login">
-  <h2>Admin Login</h2>
-  <input type="password" id="adminPass" placeholder="Admin Password">
+  <h2>Mess Wala Admin Login</h2>
+  <input type="password" id="adminPass" placeholder="Enter Admin Password">
   <br><br>
   <button onclick="login()">Login</button>
 </div>
 
+<!-- DASHBOARD -->
 <div id="dashboard" style="display:none;">
   <h2>Monthly Summary</h2>
 
@@ -25,16 +27,17 @@
   </div>
 
   <h2>Orders</h2>
-  <div id="orders"></div>
+  <div id="orders">Loading...</div>
 </div>
 
 <script>
-const PASSWORD = "messwala123";
+/* ================= CONFIG ================= */
+const PASSWORD = "messwala123";   // change if needed
 const API_URL = "https://script.google.com/macros/s/AKfycbxIgv4y6NZBItcS7EC-yurdGQSL5LSNOek_OEytJ7RH7EGySvzHa8wvCqh4s99eHvbs/exec";
 
-// 🔴 CHANGE ONLY IF YOUR UPI ID CHANGES
 const UPI_ID = "8888801902@yescred";
 const UPI_NAME = "Mess Wala";
+/* ========================================== */
 
 function login() {
   if (document.getElementById("adminPass").value === PASSWORD) {
@@ -55,32 +58,42 @@ function loadData() {
       document.getElementById("unpaid").innerText = data.unpaidCount;
 
       let html = "";
-      data.orders.forEach(o => {
-        html += `
-          <div class="menu-card">
-            <b>${o.name}</b><br>
-            📞 ${o.mobile}<br>
-            🧾 ${o.plan}<br>
-            💰 Status: <b>${o.status}</b><br><br>
 
-            <button onclick="update(${o.row}, 'PAID')">Mark PAID</button>
-            <button onclick="update(${o.row}, 'UNPAID')">Mark UNPAID</button>
+      if (data.orders.length === 0) {
+        html = "<p>No orders found.</p>";
+      } else {
+        data.orders.forEach(o => {
+          html += `
+            <div class="menu-card">
+              <b>${o.name}</b><br>
+              📞 ${o.mobile}<br>
+              🧾 ${o.plan}<br>
+              💰 Status: <b>${o.status}</b><br><br>
 
-            ${
-              o.status === "UNPAID"
-              ? `<br><br><button onclick="sendReminder('${o.mobile}', '${o.name}', '${o.plan}')">
-                   Send WhatsApp Reminder
-                 </button>`
-              : ""
-            }
-          </div>
-        `;
-      });
+              <button onclick="updateStatus(${o.row}, 'PAID')">Mark PAID</button>
+              <button onclick="updateStatus(${o.row}, 'UNPAID')">Mark UNPAID</button>
+
+              ${
+                o.status === "UNPAID"
+                ? `<br><br><button onclick="sendReminder('${o.mobile}', '${o.name}', '${o.plan}')">
+                     Send WhatsApp Payment Link
+                   </button>`
+                : ""
+              }
+            </div>
+          `;
+        });
+      }
+
       document.getElementById("orders").innerHTML = html;
+    })
+    .catch(err => {
+      document.getElementById("orders").innerHTML = "Error loading data";
+      console.error(err);
     });
 }
 
-function update(row, status) {
+function updateStatus(row, status) {
   fetch(API_URL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -89,12 +102,11 @@ function update(row, status) {
   .then(() => loadData());
 }
 
-// 🔥 PAYMENT REMINDER WITH AUTO UPI LINK
 function sendReminder(mobile, name, plan) {
   let amount = 0;
   if (plan.includes("1500")) amount = 1500;
-  if (plan.includes("2800")) amount = 2800;
-  if (plan.includes("75")) amount = 75;
+  else if (plan.includes("2800")) amount = 2800;
+  else if (plan.includes("75")) amount = 75;
 
   const upiLink =
     "upi://pay?pa=" + UPI_ID +
@@ -103,5 +115,21 @@ function sendReminder(mobile, name, plan) {
     "&cu=INR" +
     "&tn=Mess%20Wala%20Payment";
 
-  con
+  const msg =
+    "Hi " + name + ",%0A" +
+    "This is a reminder for your Mess Wala payment.%0A" +
+    "Plan: " + plan + "%0A" +
+    "Amount: ₹" + amount + "%0A%0A" +
+    "Pay here:%0A" + upiLink + "%0A%0A" +
+    "Thank you,%0A" +
+    "Mess Wala";
 
+  window.open(
+    "https://wa.me/91" + mobile + "?text=" + msg,
+    "_blank"
+  );
+}
+</script>
+
+</body>
+</html>
