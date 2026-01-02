@@ -20,7 +20,53 @@
 </div>
 
 <script>
-const PASSWORD = "messwala123"; // change this
+const PASSWORD = "messwala123"; // change if you want
+const API_URL = "PASTE_ORDERS_WEB_APP_URL_HERE";
+
+function checkLogin() {
+  const input = document.getElementById("adminPass").value;
+  if (input === PASSWORD) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    loadOrders();
+  } else {
+    alert("Wrong password");
+  }
+}
+
+function loadOrders() {
+  fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+      let html = "";
+      data.forEach(order => {
+        html += `
+          <div class="menu-card">
+            <b>${order.name}</b><br>
+            📞 ${order.mobile}<br>
+            🧾 ${order.plan}<br>
+            💰 Status: <b>${order.status}</b><br><br>
+            <button onclick="updateStatus(${order.row}, 'PAID')">Mark PAID</button>
+            <button onclick="updateStatus(${order.row}, 'UNPAID')">Mark UNPAID</button>
+          </div>
+        `;
+      });
+      document.getElementById("orders").innerHTML = html;
+    });
+}
+
+function updateStatus(row, status) {
+  fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      row: row,
+      status: status
+    })
+  })
+  .then(() => loadOrders());
+}
+</script>
 
 function checkLogin() {
   const input = document.getElementById("adminPass").value;
@@ -55,4 +101,3 @@ function loadOrders() {
 
 </body>
 </html>
-
