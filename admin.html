@@ -11,6 +11,7 @@
 <div id="login">
   <h2>Admin Login</h2>
   <input type="password" id="adminPass" placeholder="Enter Admin Password">
+  <br><br>
   <button onclick="checkLogin()">Login</button>
 </div>
 
@@ -20,8 +21,8 @@
 </div>
 
 <script>
-const PASSWORD = "messwala123"; // change if you want
-const API_URL = "https://script.google.com/macros/s/AKfycbzKDit70BsfKGfY-MV5GD3hMOxZvbtzwpHd_WhAbhTCYP4B76y1srKxsTCFl5lHo-vx/exec";
+const PASSWORD = "messwala123";   // you can change this
+const API_URL = "https://script.google.com/macros/s/AKfycbxIgv4y6NZBItcS7EC-yurdGQSL5LSNOek_OEytJ7RH7EGySvzHa8wvCqh4s99eHvbs/exec";
 
 function checkLogin() {
   const input = document.getElementById("adminPass").value;
@@ -68,37 +69,5 @@ function updateStatus(row, status) {
 }
 </script>
 
-function checkLogin() {
-  const input = document.getElementById("adminPass").value;
-  if (input === PASSWORD) {
-    document.getElementById("login").style.display = "none";
-    document.getElementById("dashboard").style.display = "block";
-    loadOrders();
-  } else {
-    alert("Wrong password");
-  }
-}
-
-function loadOrders() {
-  fetch("https://script.google.com/macros/s/AKfycbzKDit70BsfKGfY-MV5GD3hMOxZvbtzwpHd_WhAbhTCYP4B76y1srKxsTCFl5lHo-vx/exec")
-    .then(res => res.json())
-    .then(data => {
-      let html = "";
-      data.forEach(row => {
-        html += `
-          <div class="menu-card">
-            <b>${row.name}</b><br>
-            📞 ${row.mobile}<br>
-            🧾 ${row.plan}<br>
-            💰 ${row.status}
-          </div>
-        `;
-      });
-      document.getElementById("orders").innerHTML = html;
-    });
-}
-</script>
-
 </body>
 </html>
-
