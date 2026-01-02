@@ -58,8 +58,17 @@ function loadData() {
             📞 ${o.mobile}<br>
             🧾 ${o.plan}<br>
             💰 Status: <b>${o.status}</b><br><br>
+
             <button onclick="update(${o.row}, 'PAID')">Mark PAID</button>
             <button onclick="update(${o.row}, 'UNPAID')">Mark UNPAID</button>
+
+            ${
+              o.status === "UNPAID"
+              ? `<br><br><button onclick="sendReminder('${o.mobile}', '${o.name}', '${o.plan}')">
+                   Send WhatsApp Reminder
+                 </button>`
+              : ""
+            }
           </div>
         `;
       });
@@ -75,8 +84,22 @@ function update(row, status) {
   })
   .then(() => loadData());
 }
+
+function sendReminder(mobile, name, plan) {
+  const msg =
+    "Hi " + name + ",%0A" +
+    "This is a reminder for your Mess Wala payment.%0A" +
+    "Plan: " + plan + "%0A" +
+    "Kindly complete the payment at the earliest.%0A%0A" +
+    "Thank you,%0A" +
+    "Mess Wala";
+
+  window.open(
+    "https://wa.me/91" + mobile + "?text=" + msg,
+    "_blank"
+  );
+}
 </script>
 
 </body>
 </html>
-
