@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mess Wala Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="login">
+  <h2>Admin Login</h2>
+  <input type="password" id="adminPass" placeholder="Enter Admin Password">
+  <button onclick="checkLogin()">Login</button>
+</div>
+
+<div id="dashboard" style="display:none;">
+  <h2>Orders Dashboard</h2>
+  <div id="orders">Loading...</div>
+</div>
+
+<script>
+const PASSWORD = "messwala123"; // change this
+
+function checkLogin() {
+  const input = document.getElementById("adminPass").value;
+  if (input === PASSWORD) {
+    document.getElementById("login").style.display = "none";
+    document.getElementById("dashboard").style.display = "block";
+    loadOrders();
+  } else {
+    alert("Wrong password");
+  }
+}
+
+function loadOrders() {
+  fetch("PASTE_ORDERS_WEB_APP_URL_HERE")
+    .then(res => res.json())
+    .then(data => {
+      let html = "";
+      data.forEach(row => {
+        html += `
+          <div class="menu-card">
+            <b>${row.name}</b><br>
+            📞 ${row.mobile}<br>
+            🧾 ${row.plan}<br>
+            💰 ${row.status}
+          </div>
+        `;
+      });
+      document.getElementById("orders").innerHTML = html;
+    });
+}
+</script>
+
+</body>
+</html>
